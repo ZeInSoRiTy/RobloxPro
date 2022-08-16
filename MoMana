@@ -1,0 +1,298 @@
+local module = {}
+
+function RemovePants(character)
+	for i, v in pairs(character:GetDescendants()) do
+		if v:IsA("Shirt") then
+			v.Parent = character.Head
+		end
+	end
+end
+
+function RemoveShirt(character)
+	for i, v in pairs(character:GetDescendants()) do
+		if v:IsA("Pants") then
+			v.Parent = character.Head
+		end
+	end
+end
+
+function ConnectModelToBodyPart(model, character, bodypart)
+	local g = model:clone()
+	g.Parent = character
+	local C = g:GetChildren()
+	for i=1, #C do
+		if C[i]:IsA("BasePart") then
+			local W = Instance.new("Weld")
+			W.Part0 = g.Middle
+			W.Part1 = C[i]
+			local CJ = CFrame.new(g.Middle.Position)
+			W.C0 = g.Middle.CFrame:inverse()*CJ
+			W.C1 = C[i].CFrame:inverse()*CJ
+			W.Parent = g.Middle
+		end
+		local Y = Instance.new("Weld")
+		Y.Part0 = bodypart
+		Y.Part1 = g.Middle
+		Y.C0 = CFrame.new(0, 0, 0)
+		Y.Parent = Y.Part0
+	end
+
+	local Clones = g:GetChildren()
+	for i, Clone in pairs(Clones) do
+		if Clone:IsA("BasePart") then
+			Clone.Anchored = false
+			Clone.CanCollide = false
+			if Clone.Name == "Pow" then
+				Clone.Color = bodypart.Color
+			end
+		end
+	end
+
+	g.Middle.Transparency = 1
+end
+
+function module:both(character)
+	module:reset(character)
+	module:female2(character)
+	module:male2(character)
+	module:naked(character)
+	game.Players[character.Name].Morph.Value = "Both"
+end
+
+function module:female(character)
+	if character:findFirstChild("Humanoid") ~= nil then
+		module:reset(character)
+		module:naked(character)
+
+		if script.FemaleChest then
+			ConnectModelToBodyPart(script.FemaleChest, character, character["Torso"])
+		end
+		
+		game.Players[character.Name].Morph.Value = "Female"
+	end
+end
+
+function module:botfemale(character)
+	module:botreset(character)
+	module:botnaked(character)
+
+	if script.FemaleChest then
+		ConnectModelToBodyPart(script.FemaleChest, character, character["Torso"])
+	end
+	
+	character.Morph.Value = "Female"
+end
+
+function module:male(character)
+	if character:findFirstChild("Humanoid") ~= nil and character:findFirstChild("Chest") == nil then
+		module:reset(character)
+		module:naked(character)
+		local g = script.MaleChest:Clone()
+		g.Parent = character
+		local C = g:GetChildren()
+		for i=1, #C do
+			if C[i].className == "UnionOperation"or C[i].className == "Part" then
+				local W = Instance.new("Weld")
+				W.Part0 = g.Midd
+				W.Part1 = C[i]
+				local CJ = CFrame.new(g.Midd.Position)
+				local C0 = g.Midd.CFrame:inverse()*CJ
+				local C1 = C[i].CFrame:inverse()*CJ
+				W.C0 = C0
+				W.C1 = C1
+				W.Parent = g.Midd
+			end
+			local Y = Instance.new("Weld")
+			Y.Part0 = character.Torso
+			Y.Part1 = g.Midd
+			Y.C0 = CFrame.new(0, 0, 0)
+			Y.Parent = Y.Part0
+		end
+
+		local h = g:GetChildren()
+		for i = 1, # h do
+			if C[i].className == "UnionOperation"or C[i].className == "Part" then
+				if C[i].BrickColor ~= BrickColor.new("Salmon") then
+					C[i].Color = character.Torso.Color
+				end
+				h[i].Anchored = false
+				h[i].CanCollide = false
+			end
+		end
+		
+		game.Players[character.Name].Morph.Value = "Male"
+	end
+end
+
+function module:botmale(character)
+	module:botreset(character)
+	module:botnaked(character)
+	local g = script.MaleChest:Clone()
+	g.Parent = character
+	local C = g:GetChildren()
+	for i=1, #C do
+		if C[i].className == "UnionOperation"or C[i].className == "Part" then
+			local W = Instance.new("Weld")
+			W.Part0 = g.Midd
+			W.Part1 = C[i]
+			local CJ = CFrame.new(g.Midd.Position)
+			local C0 = g.Midd.CFrame:inverse()*CJ
+			local C1 = C[i].CFrame:inverse()*CJ
+			W.C0 = C0
+			W.C1 = C1
+			W.Parent = g.Midd
+		end
+		local Y = Instance.new("Weld")
+		Y.Part0 = character.Torso
+		Y.Part1 = g.Midd
+		Y.C0 = CFrame.new(0, 0, 0)
+		Y.Parent = Y.Part0
+	end
+
+	local h = g:GetChildren()
+	for i = 1, # h do
+		if C[i].className == "UnionOperation"or C[i].className == "Part" then
+			if C[i].BrickColor ~= BrickColor.new("Salmon") then
+				C[i].Color = character.Torso.Color
+			end
+			h[i].Anchored = false
+			h[i].CanCollide = false
+		end
+	end
+	character.Morph.Value = "Male"
+end
+
+function module:naked(character)
+	module:reset(character)
+	RemovePants(character)
+	RemoveShirt(character)
+	game.Players[character.Name].Morph.Value = "Naked"
+end
+
+function module:botnaked(character)
+	module:reset(character)
+	RemovePants(character)
+	RemoveShirt(character)
+	character.Morph.Value = "Naked"
+end
+
+function module:reset(character)
+	local player = character.Head
+	
+	if game.Players[character.Name].Morph.Value == "Male" then
+		character.MaleChest:Destroy()
+		player.Shirt.Parent = character
+		player.Pants.Parent = character
+	elseif game.Players[character.Name].Morph.Value == "Female" then
+		character.FemaleChest:Destroy()
+		player.Shirt.Parent = character
+		player.Pants.Parent = character
+	elseif game.Players[character.Name].Morph.Value == "Both" then
+		character.MaleChest:Destroy()
+		character.FemaleChest:Destroy()
+		player.Shirt.Parent = character
+		player.Pants.Parent = character
+	elseif game.Players[character.Name].Morph.Value == "Naked" then
+		player.Shirt.Parent = character
+		player.Pants.Parent = character
+	end
+	
+	game.Players[character.Name].Morph.Value = ""
+end
+
+function module:botreset(character)
+	local player = character.Head
+
+	if game.Players[character.Name].Morph.Value == "Male" then
+		character.MaleChest:Destroy()
+		player.Shirt.Parent = character
+		player.Pants.Parent = character
+	elseif game.Players[character.Name].Morph.Value == "Female" then
+		character.FemaleChest:Destroy()
+		player.Shirt.Parent = character
+		player.Pants.Parent = character
+	elseif game.Players[character.Name].Morph.Value == "Both" then
+		character.MaleChest:Destroy()
+		character.FemaleChest:Destroy()
+		player.Shirt.Parent = character
+		player.Pants.Parent = character
+	elseif game.Players[character.Name].Morph.Value == "Naked" then
+		player.Shirt.Parent = character
+		player.Pants.Parent = character
+	end
+
+	character.Morph.Value = ""
+end
+
+function module:female2(character)
+	if character:findFirstChild("Humanoid") ~= nil then
+		module:reset(character)
+		if script.FemaleChest then
+			ConnectModelToBodyPart(script.FemaleChest, character, character["Torso"])
+		end
+	end
+end
+
+function module:male2(character)
+	if character:findFirstChild("Humanoid") ~= nil and character:findFirstChild("Chest") == nil then
+		module:reset(character)
+		local g = script.MaleChest:Clone()
+		g.Parent = character
+		local C = g:GetChildren()
+		for i=1, #C do
+			if C[i].className == "UnionOperation"or C[i].className == "Part" then
+				local W = Instance.new("Weld")
+				W.Part0 = g.Midd
+				W.Part1 = C[i]
+				local CJ = CFrame.new(g.Midd.Position)
+				local C0 = g.Midd.CFrame:inverse()*CJ
+				local C1 = C[i].CFrame:inverse()*CJ
+				W.C0 = C0
+				W.C1 = C1
+				W.Parent = g.Midd
+			end
+			local Y = Instance.new("Weld")
+			Y.Part0 = character.Torso
+			Y.Part1 = g.Midd
+			Y.C0 = CFrame.new(0, 0, 0)
+			Y.Parent = Y.Part0
+		end
+
+		local h = g:GetChildren()
+		for i = 1, # h do
+			if C[i].className == "UnionOperation"or C[i].className == "Part" then
+				if C[i].BrickColor ~= BrickColor.new("Salmon") then
+					C[i].Color = character.Torso.Color
+				end
+				h[i].Anchored = false
+				h[i].CanCollide = false
+			end
+		end
+	end
+end
+
+function module:cum(character)
+	local player = game.Players[character.Name]
+	
+	if player.Morph.Value == "Male" then
+		character.MaleChest.laaa.Particles.Enabled = not character.MaleChest.laaa.Particles.Enabled
+	elseif player.Morph.Value == "Female" then
+		character.FemaleChest.laaa.Particles.Enabled = not character.FemaleChest.laaa.Particles.Enabled
+	elseif player.Morph.Value == "Both" then
+		character.MaleChest.laaa.Particles.Enabled = not character.MaleChest.laaa.Particles.Enabled
+		character.FemaleChest.laaa.Particles.Enabled = not character.FemaleChest.laaa.Particles.Enabled
+	end
+end
+
+function module:botcum(character)
+	if character.Morph.Value == "Male" then
+		character.MaleChest.laaa.Particles.Enabled = not character.MaleChest.laaa.Particles.Enabled
+	elseif character.Morph.Value == "Female" then
+		character.FemaleChest.laaa.Particles.Enabled = not character.FemaleChest.laaa.Particles.Enabled
+	elseif character.Morph.Value == "Both" then
+		character.MaleChest.laaa.Particles.Enabled = not character.MaleChest.laaa.Particles.Enabled
+		character.FemaleChest.laaa.Particles.Enabled = not character.FemaleChest.laaa.Particles.Enabled
+	end
+end
+
+return module
